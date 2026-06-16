@@ -1,7 +1,9 @@
 package RadarSignalSimulation;
 
+import detection.DetectionResult;
 import detection.Detector;
 import noise.NoiseModel;
+import signal.RadarScene;
 import signal.SignalGenerator;
 
 /*
@@ -24,36 +26,39 @@ public class RadarSimulator
 	}
 	
 	/*
-	 * Runs the method of creating a signal, adding noise and searching for a 
-	 * target
+	 * [runTrial] - Creates pulses, adds noise, detects, and evaluates
 	 * 
 	 * @param [signalLength]	- Size of array signal
 	 * @param [numTargets]		- Amount of targets
 	 * @param [stdDev]			- Variance being given
 	 * @param [threshold]		- Min amount to be considered a signal
+	 * @param [tolerance]		- (+/-) error on detections
 	 * 	
-	 * @return   				- Amount of targets found
+	 * @return   				- Statistics
 	 */
-	public int runTrial(int signalLength, 
-							int numTargets, 
-							double stdDev,
-							double threshold)
+	public DetectionResult runTrial(int signalLength, 
+						int numTargets, 
+						double stdDev,
+						double threshold, 
+						int tolerance)
 	{
-		double[] signal = generator.createSignal(signalLength, numTargets);
-		double[] noisySignal = noiseModel.addNoise(signal, stdDev);
-		int found = detector.countTargets(noisySignal, threshold);
+		//[1] - Generate the pulse array
+		RadarScene pulse = generator.createSignal(signalLength, numTargets);
 		
-		/*
-		 * Since there can be a signal that was NOT initially a target, we
-		 * return the smallest value between {found} and {numTargets} to avoid a
-		 * value ABOVE {numTargets}
-		 */
-		return Math.min(found, numTargets);
+		//[2] - Add noise
+		double[] noisySignal = noiseModel.addNoise(pulse.getSignal(), stdDev);
+		
+		//[3] - Detect targets (w/ returned locations)
+		int[] detected = detector.detectTargets(noisySignal, threshold);
+		
+		//[4] - Evaluate detected targets against original targets
+		return evaluate(pulse.getTrueTargetLoc(), detected, tolerance);
 	}
 	
+	
 	/*
-	 * Runs [runTrial] {n} amount of times to find the success rate of returning
-	 * the correct amount of targets
+	 * [detectionRate] - Runs {trial} amount of times to find the success rate 
+	 * 					 of returning the correct amount of targets
 	 * 
 	 * @param [trials]			- Amount of trials specified
 	 * @param [signalLength]	- Size of array signal
@@ -68,17 +73,93 @@ public class RadarSimulator
 								int signalLength,
 								int numTargets,
 								double stdDev,
-								double threshold)
+								double threshold,
+								int tolerance)
 	{
-		double percentageFound = 0.0;
+		double totalDetectionRate = 0.0;
 		
 		for(int i = 0; i < trials; i++)
 		{
-			int targetsFound = runTrial(signalLength,	numTargets, 
-										stdDev, 	  	threshold);
+			DetectionResult result = runTrial(signalLength, numTargets, stdDev, 
+												threshold, tolerance);
 			
-			percentageFound += ((double)targetsFound / numTargets);
+			totalDetectionRate += result.getDetectionRate();
 		}
-		return percentageFound / trials;
+		
+		return totalDetectionRate / trials;
+	}
+	
+	/*
+	 * [evaluate] - Compares the original pulse with the detected pulses using a 
+	 * 				tolerance window. A detection is considered correct when it
+	 * 				is within +/- of tolerance. 
+	 * 
+	 * @param [truePulses]		- Array of original pulses
+	 * @param [detectedPulses]	- Array where detected pulses were found
+	 * @param [tolerance]		- Max allowed index error for correct match
+	 * 
+	 * @return 					- Results containing TP, FP, FN
+	 */
+	private DetectionResult evaluate(int[] truePulses, int[] detectedPulses,
+										int tolerance) 
+	{
+		/***********************[Variables]************************************/
+		boolean[] matchedTrue = new boolean[truePulses.length];
+		boolean[] matchedDet = new boolean[detectedPulses.length];
+		
+		int tp = 0;
+		int fp = 0;
+		
+		
+		/***********************[Matching values]******************************/
+		
+		/*
+		 * For each detected pulse, we search for a true pulse that is within 
+		 * the tolerance window
+		 */
+		
+		for(int i = 0; i < detectedPulses.length; i++)
+		{
+			for(int j = 0; j < truePulses.length; j++) 
+			{
+				
+				/*
+				 * [1] - True pulse has not been matched 
+				 * [2] - Detected pulse is close enough to true pulse
+				 */
+				if((!matchedTrue[j]) && 
+					(Math.abs(detectedPulses[i] - truePulses[j]) <= tolerance))
+				{
+					//Mark both as matched
+					matchedTrue[j] = true;
+					matchedDet[i] = true;
+					
+					tp++;	//Successful detection
+					break;
+				}
+			}
+		}
+		
+		
+		/*
+		 * Any detected pulse that wasn't matched is a {false positive}
+		 */
+		for(int i = 0; i < detectedPulses.length; i++)
+		{
+			if(!matchedDet[i]) {fp++;}
+		}
+		
+		
+		/*
+		 * Any true pulse that was never matched is a {false negative}
+		 */
+		int fn = 0;
+		
+		for(int i = 0; i < truePulses.length; i++)
+		{
+			if(!matchedTrue[i]) {fn++;}
+		}
+		
+		return new DetectionResult(tp, fp, fn);
 	}
 }
