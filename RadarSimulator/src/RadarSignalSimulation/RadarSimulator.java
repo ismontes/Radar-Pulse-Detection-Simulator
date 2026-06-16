@@ -5,8 +5,8 @@ import noise.NoiseModel;
 import signal.SignalGenerator;
 
 /*
- * This class is meant to simulate the different instances of signals that 
- * could be generated.
+ * [Radar Simulator] - This class is meant to simulate the different instances 
+ * 					   of signals that could be generated.
  */
 public class RadarSimulator 
 {
