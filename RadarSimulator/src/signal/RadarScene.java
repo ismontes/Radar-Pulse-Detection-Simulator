@@ -26,13 +26,7 @@ public class RadarScene
 	/******************************[Getters]***********************************/
 	
 	
-	public double[] getSignal()
-	{
-		return signal;
-	}
+	public double[] getSignal() {return signal;}
 	
-	public int[] getTrueTargetLoc()
-	{
-		return trueTargetLoc;
-	}
+	public int[] getTrueTargetLoc(){return trueTargetLoc;}
 }
