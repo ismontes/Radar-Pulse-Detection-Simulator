@@ -1,30 +1,36 @@
 package detection;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /*
  * [Detector] - Determines whether a target is present using threshold 
- * 				detection
+ * 				detection and stores index values in which they are found
  */
 public class Detector 
 {
 	/*
-	 * Searches through array and looks for outliers signifiying a target
+	 * [detectTargets] - Searches through array and looks for outliers 
+	 * 					 signifying a target
 	 * 
 	 * @param [signal]		- Noisy array of values
-	 * @param [threshold]	- Target value of a valid signal
+	 * @param [threshold]	- Min value of a valid signal
 	 * 
-	 * @return 				- Boolean value if target was found
+	 * @return 				- Start index of each detected pulse
 	 */
-	public int countTargets(double[] signal, double threshold)
+	public int[] detectTargets(double[] signal, double threshold)
 	{
-		int count = 0;
+		List<Integer> detected = new ArrayList<>();
 		
-		//Checks for clumps of Targets
+		//Search array
 		for(int i = 0; i < signal.length; i++)
 		{
+			//Found rising edge of pulse
 			if(signal[i] > threshold) 
 			{
-				count++;
+				detected.add(i);
 				
+				//Skip the rest of the pulse
 				while((i + 1 < signal.length) && (signal[i + 1] > threshold))
 				{
 					i++;
@@ -32,6 +38,13 @@ public class Detector
 			}
 		}
 		
-		return count;
+		//Convert [list] to [array]
+		int[] result = new int[detected.size()];
+		for(int i = 0; i < detected.size(); i++)
+		{
+			result[i] = detected.get(i);
+		}
+		
+		return result;
 	}
 }
