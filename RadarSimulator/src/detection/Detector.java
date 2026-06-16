@@ -1,7 +1,8 @@
 package detection;
 
 /*
- * Determines whether a target is present using threshold detection
+ * [Detector] - Determines whether a target is present using threshold 
+ * 				detection
  */
 public class Detector 
 {
