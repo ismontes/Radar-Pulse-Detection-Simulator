@@ -8,44 +8,65 @@ package signal;
 public class SignalGenerator 
 {
 	/*
-	 * Creates a 1-d signal array representing time series radar-data
+	 * [createSignal] - Creates a 1-d signal array with it's corresponding index 
+	 * 					positions
 	 * 
 	 * @param [n] 			- Number of time samples
 	 * @param [numTargets] 	- Number of objects in the scene
 	 * 
-	 * @return 				- Radar signal with target spikes
+	 * @return [RadarScene]	- Signal array with TargetIndexed array
 	 */
-	public double[] createSignal(int n, int numTargets) 
+	public RadarScene createSignal(int n, int numTargets) 
 	{
-		/**Invalid Inputs**/
-		if(numTargets <= 0)
+		/************************[Invalid Inputs]******************************/
+		if(numTargets <= 0 || n <= 0)
 		{
-			throw new IllegalArgumentException("numTargets must be > 0");
+			throw new IllegalArgumentException("Inputs must be > 0");
 		}
-		if(n <= 0)
+		if(numTargets > n / 5)
 		{
-			throw new IllegalArgumentException("n must be > 0");
+			throw new IllegalArgumentException("Too many targets for signal"
+												+ "size");
 		}
-		if(numTargets > n)
-		{
-			throw new IllegalArgumentException("n must be > numTargets");
-		}
-		double[] signal = new double[n];
 
-		/*Start of [createSignal]*/
+		
+		/**********************[createSignal]**********************************/
+		double[] signal = new double[n];
+		int[] pulseIndx = new int[numTargets];
+		int index = 0;
+		
 		for(int i = 0; i < numTargets; i++)
 		{
 			//Random placement of target
-			int position = (int)(Math.random() * (n - 10));
+			int position = (int)(Math.random() * (n - 5));
+			
+			//Ensure no duplicate positions for pulse
+			boolean duplicate = false;
+			for(int j = 0; j < index; j++)
+			{
+				if(pulseIndx[j] == position);
+				{
+					duplicate = true;
+					break;
+				}
+			}
+			
+			//Retry the iteration with a new position value
+			if(duplicate)
+			{
+				i--;
+				continue;
+			}
+			
+			pulseIndx[index++] = position;
 			
 			//Each target creates a small 'pulse'
-			for(int j = position; j < position + 5; j++)
+			for(int j = position; (j < position + 5) && (j < n); j++)
 			{
 				signal[j] += 3.0 + Math.random();
 			}
 		}
 		
-		return signal;
+		return new RadarScene(signal, pulseIndx);
 	}
-
 }
