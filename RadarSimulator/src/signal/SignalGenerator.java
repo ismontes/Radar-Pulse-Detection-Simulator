@@ -2,8 +2,8 @@ package signal;
 
 /*
  * [SignalGenerator] - Creates a synthetic radar signal with multiple targets.
- * 						Each target is represented as a spike in the signal 
- * 						intensity
+ * 					   Each target is represented as a spike in the signal 
+ * 					   intensity
  */
 public class SignalGenerator 
 {
