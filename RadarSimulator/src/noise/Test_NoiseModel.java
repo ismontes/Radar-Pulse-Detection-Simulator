@@ -16,7 +16,7 @@ public class Test_NoiseModel
 		SignalGenerator gen = new SignalGenerator();
 		NoiseModel noise = new NoiseModel();
 		
-		double[] signal = gen.createSignal(500, 3);
+		double[] signal = gen.createSignal(500, 3).getSignal();
 		double[] noisy = noise.addNoise(signal, 1.0);
 		
 		if(signal.length == noisy.length)
@@ -34,7 +34,7 @@ public class Test_NoiseModel
 		SignalGenerator gen = new SignalGenerator();
 		NoiseModel noise = new NoiseModel();
 		
-		double[] signal = gen.createSignal(500, 3);
+		double[] signal = gen.createSignal(500, 3).getSignal();
 		double[] noisy = noise.addNoise(signal, 1.0);
 		
 		boolean changed = false;
@@ -57,7 +57,7 @@ public class Test_NoiseModel
 		SignalGenerator gen = new SignalGenerator();
 		NoiseModel noise = new NoiseModel();
 		
-		double[] signal = gen.createSignal(500, 3);
+		double[] signal = gen.createSignal(500, 3).getSignal();
 		double[] noisy = noise.addNoise(signal, 0.0);
 		
 		boolean same = true;
