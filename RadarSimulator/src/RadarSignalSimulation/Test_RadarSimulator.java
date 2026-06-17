@@ -4,7 +4,6 @@ import detection.DetectionResult;
 
 public class Test_RadarSimulator 
 {
-
 	public static void main(String[] args) 
 	{
 		/*
