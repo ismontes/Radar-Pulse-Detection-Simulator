@@ -44,7 +44,7 @@ public class SignalGenerator
 			boolean duplicate = false;
 			for(int j = 0; j < index; j++)
 			{
-				if(pulseIndx[j] == position);
+				if(pulseIndx[j] == position)
 				{
 					duplicate = true;
 					break;
