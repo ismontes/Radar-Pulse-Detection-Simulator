@@ -24,6 +24,17 @@ public class DetectionResult
 		falseNeg = fn;
 	}
 	
+	/*
+	 * [toString] - Format the results nicely
+	 */
+	@Override
+	public String toString()
+	{
+		return "True Pos. = " + truePos + ", " +
+				"False Pos. = "+ falsePos + ", " +
+				"False Neg. = "+ falseNeg + ", " +
+				"Detection Rate = " + String.format("%.2f", getDetectionRate());
+	}
 	
 	/******************************[Getters]***********************************/
 	public int getTruePos() {return truePos;}
