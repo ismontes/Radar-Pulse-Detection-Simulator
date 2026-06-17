@@ -1,8 +1,11 @@
-package RadarSignalSimulation;
-
+import RadarSignalSimulation.RadarSimulator;
 import detection.DetectionResult;
 
-public class Test_RadarSimulator 
+/*
+ * [Main] - Here we run the variety of tests by changing different variables and
+ * 			seeing how the accuracy fluctuates
+ */
+public class Main 
 {
 	public static void main(String[] args) 
 	{
@@ -41,5 +44,4 @@ public class Test_RadarSimulator
 		DetectionResult result5 = test5.runTrial(500, 15, 1.0, 2.5, 0);
 		System.out.println("Test 5: " + result5 + "\n");
 	}
-
 }
